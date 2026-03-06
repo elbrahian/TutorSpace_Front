@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Student from './pages/Student';
 import Tutor from './pages/Tutor';
 import Admin from './pages/Admin';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         </Route>
 
         {/* Fallback general */}
+        <Route path="/chat/:threadId" element={<ChatPage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

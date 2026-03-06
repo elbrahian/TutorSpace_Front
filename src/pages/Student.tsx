@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
+import { getSession } from '../lib/session';
 import { fetchTutors } from '../lib/api';
+import { getOrCreateThread } from '../lib/chatApi';
 import type { Tutor } from '../types';
 
 export default function Student() {
+    const navigate = useNavigate();
+    const session = getSession();
     const [tutors, setTutors] = useState<Tutor[]>([]);
     const [filter, setFilter] = useState('ALL');
     const [loading, setLoading] = useState(false);
@@ -35,6 +40,17 @@ export default function Student() {
 
         return () => { mounted = false; };
     }, [filter]);
+
+    const handleOpenChat = async (tutorId: number) => {
+        if (!session) return;
+        try {
+            const thread = await getOrCreateThread(session.id, tutorId);
+            navigate(`/chat/${thread.id}`);
+        } catch (err) {
+            console.error("Error al abrir chat", err);
+            alert("No se pudo abrir el chat.");
+        }
+    };
 
     return (
         <>
@@ -78,8 +94,11 @@ export default function Student() {
                                     </p>
                                     <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>{tutor.email}</p>
 
-                                    <button disabled style={{ width: '100%', fontSize: '0.75rem' }}>
-                                        Abrir chat (próximamente)
+                                    <button
+                                        onClick={() => handleOpenChat(tutor.id)}
+                                        style={{ width: '100%', fontSize: '0.75rem' }}
+                                    >
+                                        Abrir chat
                                     </button>
                                 </div>
                             ))}
